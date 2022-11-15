@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u*nw%kdh4_itm4xuk5=-oo=q4#@--u*m(@46s*yf*oyhf)u+7!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["5d7d-84-54-70-76.ngrok.io"]
 
 
 # Application definition
@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'payme',
-    'payment.apps.PaymentConfig'
+    # 'payme',
+    'rest_framework',
+    'payme.apps.PaymentConfig'
 ]
 
 MIDDLEWARE = [
@@ -125,10 +126,10 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PAYME: dict = {
-    'PAYME_ID': 'payme-id',
-    'PAYME_KEY': 'payme-key',
+    'PAYME_ID': 'payme-id', # merchant_id
+    'PAYME_KEY': 'payme-key', # merchant_key
     'PAYME_URL': 'payme-checkout-url',
     'PAYME_CALL_BACK_URL': 'your-callback-url', # merchant api callback url
     'PAYME_MIN_AMOUNT': 'payme-min-amount', # integer field
-    'PAYME_ACCOUNT': 'order-id',
+    'PAYME_ACCOUNT': 'order-id',  # payme kassa rekviziti
 }
