@@ -157,3 +157,6 @@ SECRET_KEY = env.str("SECRET_KEY")
 
 # PAYCOM_ID
 PAYCOM_ID = env.str("PAYCOM_ID")
+
+# PAYCOM_KEY
+PAYCOM_KEY = env.str("PAYCOM_KEY")
