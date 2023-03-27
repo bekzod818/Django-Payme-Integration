@@ -23,6 +23,7 @@ class PaymeSubscribeReceipts:
             "receipts_cancel": "receipts.cancel",
             "receipts_create": "receipts.create",
             "receipts_get_all": "receipts.get_all",
+            "receipts_confirm_hold": "receipts.confirm_hold"
         }
 
     def __request(self, data: dict) -> dict:
@@ -33,7 +34,7 @@ class PaymeSubscribeReceipts:
         }
         return requests.post(**req_data).json()
 
-    def _receipts_create(self, amount: float, order_id: int) -> dict:
+    def _receipts_create(self, amount: float, order_id: int, **kwargs) -> dict:
         """Use this method to create a new payment receipt.
         :param amount float: Payment amount in tiyins
         :param order_id int: Order object ID
@@ -49,9 +50,10 @@ class PaymeSubscribeReceipts:
                 }
             }
         }
+        data["params"].update(kwargs)
         return self.__request(self._parse_to_json(**data))
 
-    def _receipts_pay(self, invoice_id: str, token: str, phone: str) -> dict:
+    def _receipts_pay(self, invoice_id: str, token: str, phone: str, **kwargs) -> dict:
         """Use this method to pay for an exist receipt.
         :param invoice_id: invoice id for indentity transaction
         :param token string: The card's active token
@@ -69,7 +71,18 @@ class PaymeSubscribeReceipts:
                 }
             }
         }
+        data["params"].update(kwargs)
         return self.__request(self._parse_to_json(**data))
+
+    def _receipts_confirm_hold(self, invoice_id: str):
+        data: dict = {
+            "method": self.__methods.get('receipts_confirm_hold'),
+            "params": {
+                "id": invoice_id
+            }
+        }
+        return self.__request(self._parse_to_json(**data))
+
 
     def _receipts_send(self, invoice_id: str, phone: str) -> dict:
         """Use this method to send a receipt for payment in an SMS message.
