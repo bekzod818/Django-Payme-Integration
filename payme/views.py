@@ -1,7 +1,11 @@
 import base64
 import binascii
 
+from django.shortcuts import render
 from django.conf import settings
+from django.views import View
+from .forms import CreateCardForm, VerifyCodeForm
+from .cards.subscribe_cards import PaymeSubscribeCards
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -125,3 +129,36 @@ class MerchantAPIView(APIView):
             )
 
         return is_payme
+    
+
+class CreateCardView(View):
+    def get(self, request):
+        form = CreateCardForm()
+        return render(request, "payme/create_card.html", {"form": form})
+    
+    def post(self, request):
+        form = CreateCardForm(request.POST)
+        if form.is_valid():
+            client = PaymeSubscribeCards(
+                base_url="https://checkout.test.paycom.uz/api/",
+                paycom_id=settings.PAYCOM_ID
+            )
+            resp = client._cards_create(
+                number=form.cleaned_data.get("card_number"),
+                expire=f"{form.cleaned_data.get('expires_month')}{form.cleaned_data.get('expires_year')}",
+                save=True
+            )
+            if resp.get("result"):
+                token = resp.get("result").get("card").get("token")
+                send_code_resp = client._card_get_verify_code(token=token)
+                if send_code_resp.get("result"):
+                    send_status = send_code_resp.get("result").get("sent")
+                    if send_status:
+                        form = VerifyCodeForm(request.POST)
+                        if form.is_valid():
+                            resp = client._cards_verify(
+                                verify_code=form.cleaned_data.get("verify_code"),
+                                token=token
+                            )
+                            print(resp)
+        return render(request, "payme/create_card.html", {"form": form})
